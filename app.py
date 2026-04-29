@@ -1,35 +1,26 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import pandas as pd
-import os
+import io
 
 app = Flask(__name__)
-UPLOAD_FOLDER = "uploads"
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
-@app.route("/upload", methods=["POST"])
-def upload_file():
-    file = request.files["file"]
-    filepath = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
-    file.save(filepath)
+@app.route("/paste", methods=["POST"])
+def paste_data():
+    try:
+        text = request.json.get("text", "")
+        df = pd.read_csv(io.StringIO(text))
 
-    df = pd.read_csv(filepath)
+        return jsonify({
+            "labels": df.iloc[:, 0].astype(str).tolist(),
+            "values": df.iloc[:, 1].tolist()
+        })
 
-    # Simple assumption: first 2 columns = x and y
-    x = df.iloc[:, 0].tolist()
-    y = df.iloc[:, 1].tolist()
-
-    return {
-        "labels": x,
-        "values": y
-    }
-
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(debug=True)

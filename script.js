@@ -1,35 +1,53 @@
+console.log("JS LOADED");
+
 let chart;
 
-function uploadFile() {
-    const fileInput = document.getElementById("fileInput");
-    const file = fileInput.files[0];
+function generateChart() {
 
-    let formData = new FormData();
-    formData.append("file", file);
+    const text = document.getElementById("pasteInput").value;
 
-    fetch("/upload", {
+    fetch("/paste", {
         method: "POST",
-        body: formData
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text })
     })
     .then(res => res.json())
     .then(data => {
-        renderChart(data.labels, data.values);
-    });
-}
 
-function renderChart(labels, values) {
-    const ctx = document.getElementById("chart");
+        const ctx = document.getElementById("chart");
 
-    if (chart) chart.destroy();
+        if (chart) chart.destroy();
 
-    chart = new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: labels,
-            datasets: [{
-                label: "Sales Data",
-                data: values
-            }]
-        }
+        const colors = [
+            "#4cc9f0",
+            "#4895ef",
+            "#4361ee",
+            "#3a0ca3",
+            "#7209b7",
+            "#f72585"
+        ];
+
+        chart = new Chart(ctx, {
+            type: "pie",   // 🔥 now pie chart
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: "Data",
+                    data: data.values,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "black"
+                        }
+                    }
+                }
+            }
+        });
     });
 }

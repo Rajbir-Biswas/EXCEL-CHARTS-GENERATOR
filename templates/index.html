@@ -1,19 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Data Visualizer</title>
+  <title>Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
 
-  <h1>📊 Excel / CSV Visualizer</h1>
+<div class="container">
+  <h1>📊 Data Dashboard</h1>
 
-  <input type="file" id="fileInput">
-  <button onclick="uploadFile()">Generate Chart</button>
+  <textarea id="pasteInput">
+Name,Value
+Apple,10
+Banana,20
+Mango,30
+  </textarea>
 
-  <canvas id="chart" width="400" height="200"></canvas>
+  <br>
 
-  <script src="/static/script.js"></script>
+  <button onclick="generateChart()">Generate Chart</button>
+
+  <canvas id="chart"></canvas>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
 </body>
 </html>
